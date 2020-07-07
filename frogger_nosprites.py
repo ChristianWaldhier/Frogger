@@ -47,7 +47,7 @@ class Wall(object):
     def __init__(self, pos):
         walls.append(self)
         self.rect = pygame.Rect(pos[0], pos[1], 16, 16)
-        self.vx = 1
+        self.vx = random.randrange(1, 3)
         self.pos = pos
         self.x = pos[0]
         self.y = pos[1]
