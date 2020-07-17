@@ -1,5 +1,5 @@
-#! /usr/bin/env python
-# https://www.pygame.org/project-Rect+Collision+Response-1061-.html
+
+
 
 import random
 import pygame
@@ -35,13 +35,17 @@ class Car(object):
         self.rect = pygame.Rect(x, y, 32, 32)
         self.vx = random.randrange(1, 3)
         self.color = pygame.Color("white")
+        self.alive = True
                
     def move(self):
         self.rect = pygame.Rect(self.x + self.vx, self.y, 32, 32)
         self.x += self.vx
-
+        if self.rect.colliderect(self.rect):
+            self.vx = 0
+            self.color = pygame.Color("red")
+        
     def draw(self):
-        pygame.draw.rect(screen, self.color, car.rect)
+        pygame.draw.rect(screen, self.color, self.rect)
 
 
 pygame.init()
@@ -54,10 +58,12 @@ cars = []
 frog = Frog(32)
 
 
-Car(0, SCREEN_HEIGHT / 2)
+
 end_rect = pygame.Rect(SCREEN_WIDTH / 2, 0, 32, 32)
 
-
+while len(cars) < 10:
+    Car(0, random.randrange(0, SCREEN_HEIGHT))
+    
 while True:
     clock.tick(60)
     for e in pygame.event.get():
@@ -80,3 +86,7 @@ while True:
     pygame.draw.rect(screen, pygame.Color("green"), end_rect)
     frog.draw()
     pygame.display.flip()
+
+
+
+
