@@ -6,12 +6,14 @@ import time
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-LIFESPAN = 100
+LIFESPAN = 300
 
 
-population_count = 3
+population_count = 10
 count = 0
 generation = 0
+
+mutation_rate = 3
 
 # TO-DO: create surface to be able to set alpha, see smart boxes
 
@@ -30,11 +32,14 @@ class Frog(object):
         self.dna = DNA()
         
     def calculate_fitness(self):
-        self.fitness = round(1 - self.y / SCREEN_HEIGHT, 2)
+        self.fitness = ((1 - self.y / SCREEN_HEIGHT) * 100) ** 2
         
     def draw(self):
         pygame.draw.rect(screen, self.color, self.rect)
         self.calculate_fitness()
+        
+    def remove(self):
+        frogs.remove(self)
 
 
 
@@ -69,6 +74,8 @@ class DNA():
             self.genes.append(random.randint(-6, 6))
         if generation > 0:
             self.genes = crossover()
+            self.genes = mutate(self.genes)
+            
 
         
 class Car():
@@ -88,7 +95,7 @@ class Car():
             self.rect = pygame.Rect(self.x + self.vx, self.y, self.w, self.h)
             self.x += self.vx
         else:
-            self.x = -32
+            self.x = -50
 
         
     def draw(self):
@@ -105,34 +112,6 @@ class Wall():
     def draw(self):
         pygame.draw.rect(screen, self.color, self.rect)
 
-
-pygame.init()
-
-pygame.display.set_caption("Get to the green square!")
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
-clock = pygame.time.Clock()
-cars = []
-walls = []
-
-frogs = []
-
-Wall(0, 0, SCREEN_WIDTH, 10)
-Wall(0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10)
-
-end_rect = pygame.Rect(10, 10, SCREEN_WIDTH, 32)
-
-# create cars
-Car(0, 100, 60, 30)
-Car(-300, 200, 60, 30)
-Car(-200, 300, 60, 30)
-# Car(0, 400, 60, 30)
-# Car(-100, 500, 60, 30)
-    
-while len(frogs) < 3:
-    Frog(random.randrange(20, SCREEN_WIDTH), SCREEN_HEIGHT - 150, 16)
-
-
 def calc_selection_prob():
     total_fitness = 0
     for frog in frogs:
@@ -145,18 +124,14 @@ def calc_selection_prob():
 
 def select_frog():
     # selected_frog = random.randint(0, len(frogs) - 1)
-    # if frogs[selected_frog].fitness > random.random():
-    #     return frogs[selected_frog].dna
+    # if frogs[selected_frog].fitness > random.randint(0, 100):
+    #     return frogs[selected_frog].dna.genes
     # else:
     #     select_frog()
         
-
     selection_accepted = False
     
-    
-    
-    
-    for _ in range(1000):
+    for _ in range(10000000):
         selected_frog = random.randint(0, len(frogs) - 1)
         random_number = random.randint(0, 100)
         print("fitness: " + str(frogs[selected_frog].fitness))
@@ -174,8 +149,6 @@ def select_frog2():
         if prob < 0:
             return i
 
-
-
         
 def crossover():
     mid = random.randrange(0, LIFESPAN)
@@ -189,15 +162,30 @@ def crossover():
         if i > mid:
             genes_child[i] = genes_mama[i]
         else:
-            print(i)
             genes_child[i] = genes_papa[i]
 
     return genes_child
 
+def mutate(a):
+    prob = random.randrange(0, 100)
+    index = random.randrange(0, LIFESPAN)
+    if prob < mutation_rate:
+        if random.randint(0, 1):
+            a[index] = 10
+        else:
+            a[index] = -10
+
+    return a
+
+
+
+
+
+
 
 def create_frogs():
     for _ in range(population_count):
-        Frog(random.randrange(20, SCREEN_WIDTH), SCREEN_HEIGHT - 100, 16)
+        Frog(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100, 16)
 
 
 def draw_screen():
@@ -217,7 +205,33 @@ def draw_screen():
     for wall in walls:
         wall.draw()
 
+
+
+pygame.init()
+
+pygame.display.set_caption("Get to the green square!")
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+clock = pygame.time.Clock()
+cars = []
+walls = []
+
+frogs = []
+
+Wall(0, 0, SCREEN_WIDTH, 10)
+Wall(0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10)
+
+end_rect = pygame.Rect(10, 10, SCREEN_WIDTH, 32)
+
+# create cars
+Car(0, 100, 80, 50)
+Car(-300, 200, 80, 50)
+Car(-200, 300, 80, 50)
+Car(0, 400, 80, 50)
+# Car(-100, 500, 80, 50)
     
+create_frogs()
+
 while True:
     clock.tick(60)
     for e in pygame.event.get():
@@ -232,8 +246,14 @@ while True:
     
     if count == LIFESPAN - 1:
         calc_selection_prob()
-        generation = 1
+        generation += 1
+        for i in range(len(frogs) - 1):
+            frogs[i].alive = False
+
         create_frogs()
-        time.sleep(2)
+        for frog in frogs:
+            if frog.alive == False:
+                frog.remove()
+        
         
         count = 0
