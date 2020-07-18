@@ -1,7 +1,6 @@
 import random
 import pygame
 import sys
-import time
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -15,18 +14,22 @@ generation = 0
 mutation_rate = 10
 fitness_pop = 0
 
+cars = []
+walls = []
+frogs = []
+
 
 class Frog(object):
-    
     def __init__(self, x, y, size):
         frogs.append(self)
         self.x = x
         self.y = y
         self.rect = pygame.Rect(self.x, self.y, size, size)
-        self.color = pygame.Color("darkgreen")
+        self.color = pygame.Color("turquoise")
         self.vy = 0
         self.fitness = 0
         self.alive = True
+        self.generation = generation
         self.dna = DNA()
         
     def calculate_fitness(self):
@@ -44,25 +47,25 @@ class Frog(object):
         self.y += self.dna.genes[count]
         self.rect.y += self.dna.genes[count]
 
-
         for car in cars:
             if self.rect.colliderect(car.rect):
-                self.color = pygame.Color("brown")
+                self.color = pygame.Color("salmon")
                 self.vy = 0
                 self.alive = False
                 
         for wall in walls:
             if self.rect.colliderect(wall.rect):
-                self.color = pygame.Color("brown")
+                self.color = pygame.Color("salmon")
                 self.vy = 0
                 self.alive = False
                 
         if self.rect.colliderect(end_rect):
-            self.color = pygame.Color("green")
+            self.color = pygame.Color("turquoise1")
             self.vy = 0
             self.alive = False
             self.fitness = 1
-                
+  
+              
 class DNA():
     def __init__(self):
         self.genes = []
@@ -73,7 +76,6 @@ class DNA():
             self.genes = mutate(self.genes)
             
 
-        
 class Car():
     def __init__(self, x, y, w, h):
         cars.append(self)
@@ -83,7 +85,7 @@ class Car():
         self.h = h
         self.rect = pygame.Rect(x - w, y, w, h)
         self.vx = 2
-        self.color = pygame.Color("darkmagenta")
+        self.color = pygame.Color("grey96")
         self.alive = True
                
     def move(self):
@@ -92,10 +94,10 @@ class Car():
             self.x += self.vx
         else:
             self.x = -50
-
-        
+     
     def draw(self):
         pygame.draw.rect(screen, self.color, self.rect)
+
         
 class Wall():
     def __init__(self, x, y, width, height):
@@ -103,10 +105,11 @@ class Wall():
         self.x = x
         self.y = y
         self.rect = pygame.Rect(x, y, width, height)
-        self.color = pygame.Color("white")
+        self.color = pygame.Color("grey96")
         
     def draw(self):
         pygame.draw.rect(screen, self.color, self.rect)
+
 
 def calc_selection_prob():
     total_fitness = 0
@@ -117,23 +120,15 @@ def calc_selection_prob():
         frog.fitness = int(frog.fitness / total_fitness * 100)
 
 
-
-     
-
 def select_frog():
-
-
-
     selection_accepted = False
-    
-    while selection_accepted == False:
+    while selection_accepted is False:
         selected_frog = random.randint(0, len(frogs) - 1)
         random_number = random.randint(0, fitness_pop)
         if frogs[selected_frog].fitness >= random_number:
             selection_accepted = True
             return frogs[selected_frog].dna.genes
-            
-            
+                       
         
 def crossover():
     mid = random.randrange(0, LIFESPAN)
@@ -151,6 +146,7 @@ def crossover():
 
     return genes_child
 
+
 def mutate(a):
     prob = random.randrange(0, 100)
     index = random.randrange(0, LIFESPAN)
@@ -158,9 +154,11 @@ def mutate(a):
         a[index] = random.randint(-10, 10)
     return a
 
+
 def create_frogs():
     for _ in range(population_count):
         Frog(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100, 16)
+
 
 def create_cars():
     cars.clear()
@@ -168,47 +166,36 @@ def create_cars():
     Car(-300, 200, 80, 50)
     Car(-200, 300, 80, 50)
     Car(0, 400, 80, 50)
-    # Car(-100, 500, 80, 50)
 
 
 def draw_screen():
-
-    screen.fill((0, 0, 0))
-    
+    screen.fill((51, 51, 51))
     for frog in frogs:
         if frog.alive:
             frog.move()
         frog.draw()
-    
     for car in cars:
         car.move()
         car.draw()
-    pygame.draw.rect(screen, pygame.Color("blue"), end_rect)
-    
+    pygame.draw.rect(screen, pygame.Color("royalblue"), end_rect)
     for wall in walls:
         wall.draw()
-        
+
+
 def calc_fitness_pop():
     global fitness_pop
     for frog in frogs:
         fitness_pop += frog.fitness
 
-pygame.init()
 
+pygame.init()
 pygame.display.set_caption("Get to the green square!")
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
 clock = pygame.time.Clock()
-cars = []
-walls = []
-
-frogs = []
 
 Wall(0, 0, SCREEN_WIDTH, 10)
 Wall(0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10)
-
 end_rect = pygame.Rect(0, 10, SCREEN_WIDTH, 32)
-   
 create_frogs()
 create_cars()
 
@@ -233,7 +220,8 @@ while True:
         create_frogs()
         create_cars()
         for frog in frogs:
-            if frog.alive == False:
+            if frog.alive is False:
                 frog.remove()
+                # frogs.pop[frog]
         
         count = 0
