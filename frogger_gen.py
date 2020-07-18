@@ -6,16 +6,14 @@ import time
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-LIFESPAN = 500
+LIFESPAN = 600
 
 
-population_count = 30
+population_count = 100
 count = 0
 generation = 0
 
 mutation_rate = 10
-
-# TO-DO: create surface to be able to set alpha, see smart boxes
 
 
 class Frog(object):
@@ -49,18 +47,18 @@ class Frog(object):
 
         for car in cars:
             if self.rect.colliderect(car.rect):
-                self.color = pygame.Color("red")
+                self.color = pygame.Color("brown")
                 self.vy = 0
                 self.alive = False
                 
         for wall in walls:
             if self.rect.colliderect(wall.rect):
-                self.color = pygame.Color("red")
+                self.color = pygame.Color("brown")
                 self.vy = 0
                 self.alive = False
                 
         if self.rect.colliderect(end_rect):
-            self.color = pygame.Color("red")
+            self.color = pygame.Color("green")
             self.vy = 0
             self.alive = False
             self.fitness = 1
@@ -85,7 +83,7 @@ class Car():
         self.h = h
         self.rect = pygame.Rect(x - w, y, w, h)
         self.vx = 2
-        self.color = pygame.Color("blue")
+        self.color = pygame.Color("darkmagenta")
         self.alive = True
                
     def move(self):
@@ -130,11 +128,7 @@ def select_frog():
     
     for _ in range(10000000):
         selected_frog = random.randint(0, len(frogs) - 1)
-        random_number = random.randint(0, total_fitness)
-        print("fitness: " + str(frogs[selected_frog].fitness))
-        print("rand: " +  str(random_number))
-        
-        
+        random_number = random.randint(0, total_fitness)    
         if frogs[selected_frog].fitness >= random_number:
             print("fitness: " + str(frogs[selected_frog].fitness))
             print("rand: " +  str(random_number))
@@ -163,11 +157,7 @@ def mutate(a):
     prob = random.randrange(0, 100)
     index = random.randrange(0, LIFESPAN)
     if prob < mutation_rate:
-        if random.randint(0, 1):
-            a[index] = 10
-        else:
-            a[index] = -10
-
+        a[index] = random.randint(-10, 10)
     return a
 
 def create_frogs():
@@ -175,10 +165,7 @@ def create_frogs():
         Frog(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100, 16)
 
 def create_cars():
-    
-    for car in cars:
-        cars.remove(car)
-        
+    cars.clear()
     Car(0, 100, 80, 50)
     Car(-300, 200, 80, 50)
     Car(-200, 300, 80, 50)
@@ -198,12 +185,10 @@ def draw_screen():
     for car in cars:
         car.move()
         car.draw()
-    pygame.draw.rect(screen, pygame.Color("lightblue"), end_rect)
+    pygame.draw.rect(screen, pygame.Color("blue"), end_rect)
     
     for wall in walls:
         wall.draw()
-
-
 
 pygame.init()
 
@@ -219,7 +204,7 @@ frogs = []
 Wall(0, 0, SCREEN_WIDTH, 10)
 Wall(0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10)
 
-end_rect = pygame.Rect(10, 10, SCREEN_WIDTH, 32)
+end_rect = pygame.Rect(0, 10, SCREEN_WIDTH, 32)
    
 create_frogs()
 create_cars()
