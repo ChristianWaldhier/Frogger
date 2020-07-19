@@ -20,6 +20,7 @@ frogs = []
 
 
 class Frog(object):
+    global generation
     def __init__(self, x, y, size):
         frogs.append(self)
         self.x = x
@@ -36,8 +37,9 @@ class Frog(object):
         self.fitness = int(((1 - self.y / SCREEN_HEIGHT) * 100) ** 2)
         
     def draw(self):
-        pygame.draw.rect(screen, self.color, self.rect)
-        self.calculate_fitness()
+        if self.generation == generation:
+            pygame.draw.rect(screen, self.color, self.rect)
+            self.calculate_fitness()
         
     def remove(self):
         frogs.remove(self)
@@ -64,7 +66,9 @@ class Frog(object):
             self.vy = 0
             self.alive = False
             self.fitness = 1
-  
+
+    def __del__(self):
+        pass
               
 class DNA():
     def __init__(self):
@@ -219,9 +223,10 @@ while True:
 
         create_frogs()
         create_cars()
-        for frog in frogs:
-            if frog.alive is False:
-                frog.remove()
-                # frogs.pop[frog]
+        for i in range(99):
+            if frogs[i].alive is False:
+                # frogs[i].remove()
+                del frogs[i]
+                #frogs.pop(i)
         
         count = 0
