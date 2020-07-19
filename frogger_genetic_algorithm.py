@@ -46,8 +46,10 @@ class Frog(object):
 
     def move(self):
         
-        self.y += self.dna.genes[count]
-        self.rect.y += self.dna.genes[count]
+        self.y += self.dna.genes[count][0]
+        self.rect.y += self.dna.genes[count][0]
+        self.x += self.dna.genes[count][1]
+        self.rect.x += self.dna.genes[count][1]
 
         for car in cars:
             if self.rect.colliderect(car.rect):
@@ -74,7 +76,7 @@ class DNA():
     def __init__(self):
         self.genes = []
         for i in range(LIFESPAN):
-            self.genes.append(random.randint(-10, 10))
+            self.genes.append([random.randint(-10, 10), random.randint(-10, 10)])
         if generation > 0:
             self.genes = crossover()
             self.genes = mutate(self.genes)
@@ -140,14 +142,14 @@ def crossover():
     genes_mama = select_frog()
     genes_papa = select_frog()
     genes_child = []
-    genes_child = [0] * LIFESPAN
+    genes_child = [0, 0] * LIFESPAN
+    
         
     for i in range(LIFESPAN):
         if i > mid:
             genes_child[i] = genes_mama[i]
         else:
             genes_child[i] = genes_papa[i]
-
     return genes_child
 
 
@@ -155,7 +157,7 @@ def mutate(a):
     prob = random.randrange(0, 100)
     index = random.randrange(0, LIFESPAN)
     if prob < mutation_rate:
-        a[index] = random.randint(-10, 10)
+        a[index] = [random.randint(-10, 10), random.randint(-10, 10)]
     return a
 
 
