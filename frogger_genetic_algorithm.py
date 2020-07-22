@@ -1,9 +1,12 @@
 import random
 import pygame
 import sys
+pygame.font.init()
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
+
+STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
 LIFESPAN = 600
 
@@ -90,7 +93,7 @@ class Car():
         self.w = w
         self.h = h
         self.rect = pygame.Rect(x - w, y, w, h)
-        self.vx = 2
+        self.vx = 5
         self.color = pygame.Color("grey96")
         self.alive = True
                
@@ -172,7 +175,7 @@ def create_cars():
     Car(-300, 200, 80, 50)
     Car(-200, 300, 80, 50)
     Car(0, 400, 80, 50)
-
+    Car(-100, 500, 80, 50)
 
 def draw_screen():
     screen.fill((51, 51, 51))
@@ -186,6 +189,12 @@ def draw_screen():
     pygame.draw.rect(screen, pygame.Color("royalblue"), end_rect)
     for wall in walls:
         wall.draw()
+        
+    draw_stats()
+        
+def draw_stats():
+    score_label = STAT_FONT.render("Generation: " + str(generation),1,(255,255,255))
+    screen.blit(score_label, (SCREEN_WIDTH - score_label.get_width() - 15, 10))
 
 
 def calc_fitness_pop():
