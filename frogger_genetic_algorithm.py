@@ -1,29 +1,29 @@
 import random
 import pygame
 import sys
-import time
+
 pygame.font.init()
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
-
 LIFESPAN = 600
 
 population_count = 100
 count = 0
 generation = 0
-
 mutation_rate = 10
 fitness_pop = 0
+
+START_SPEED = 30
+speed = START_SPEED
 
 cars = []
 walls = []
 frogs = []
 
 
-class Frog(object):
+class Frog():
     global generation
     def __init__(self, x, y, size):
         frogs.append(self)
@@ -75,7 +75,8 @@ class Frog(object):
 
     def __del__(self):
         pass
-              
+     
+         
 class DNA():
     def __init__(self):
         self.genes = []
@@ -103,7 +104,7 @@ class Car():
         if self.vx > 0:
             if self.x < SCREEN_WIDTH:
                 self.rect = pygame.Rect(self.x + self.vx, self.y, self.w, self.h)
-                self.x += self.vx 
+                self.x += self.vx
             else:
                 self.x = -50
                 
@@ -114,7 +115,6 @@ class Car():
             else:
                 self.x = SCREEN_WIDTH + 50
         
-     
     def draw(self):
         pygame.draw.rect(screen, self.color, self.rect)
 
@@ -157,8 +157,7 @@ def crossover():
     genes_papa = select_frog()
     genes_child = []
     genes_child = [0, 0] * LIFESPAN
-    
-        
+      
     for i in range(LIFESPAN):
         if i > mid:
             genes_child[i] = genes_mama[i]
@@ -191,8 +190,8 @@ def create_cars():
     Car(SCREEN_WIDTH + 500, 400, 80, 50, -5)
     Car(-300, 480, 80, 50, 5)
 
-def draw_screen():
 
+def draw_screen():
     screen.fill((51, 51, 51))
     pygame.draw.rect(screen, pygame.Color("SteelBlue"), end_rect)
     pygame.draw.rect(screen, pygame.Color("SteelBlue"), start_rect)
@@ -207,9 +206,10 @@ def draw_screen():
         car.draw()
 
     draw_stats()
-        
+
+     
 def draw_stats():
-    score_label = STAT_FONT.render("Generation: " + str(generation),1,(255,255,255))
+    score_label = STAT_FONT.render("Generation: " + str(generation), 1, (255, 255, 255))
     screen.blit(score_label, (SCREEN_WIDTH - score_label.get_width() - 15, 15))
 
 
@@ -224,39 +224,63 @@ pygame.display.set_caption("Reach the other side!")
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 
-pygame.time.wait(15000)
 
 Wall(0, 0, SCREEN_WIDTH, 10)
 Wall(0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 20)
 end_rect = pygame.Rect(0, 10, SCREEN_WIDTH, 40)
-start_rect = pygame.Rect(0, SCREEN_HEIGHT-50, SCREEN_WIDTH, 40)
+start_rect = pygame.Rect(0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, 40)
 create_frogs()
 create_cars()
 
-while True:
-    clock.tick(60)
-    for e in pygame.event.get():
-        if e.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-     
-    draw_screen()
-    pygame.display.flip()
+def main():
+    global speed, count, generation, frogs
     
-    count += 1
-    
-    if count == LIFESPAN - 1:
-        generation += 1
-        for i in range(len(frogs) - 1):
-            frogs[i].alive = False
-        calc_fitness_pop()
-
-        create_frogs()
-        create_cars()
-        for i in range(99):
-            if frogs[i].alive is False:
-                # frogs[i].remove()
-                del frogs[i]
-                #frogs.pop(i)
+    while True:
         
-        count = 0
+        clock.tick(speed)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    speed = START_SPEED * 1
+                if event.key == pygame.K_2:
+                    speed = START_SPEED * 2
+                if event.key == pygame.K_3:
+                    speed = START_SPEED * 3
+                if event.key == pygame.K_4:
+                    speed = START_SPEED * 4
+                if event.key == pygame.K_5:
+                    speed = START_SPEED * 5
+                if event.key == pygame.K_6:
+                    speed = START_SPEED * 6
+                if event.key == pygame.K_7:
+                    speed = START_SPEED * 7
+                if event.key == pygame.K_8:
+                    speed = START_SPEED * 8
+                if event.key == pygame.K_9:
+                    speed = START_SPEED * 9
+         
+        draw_screen()
+        pygame.display.flip()
+        
+        count += 1
+        
+        if count == LIFESPAN - 1:
+            generation += 1
+            for i in range(len(frogs) - 1):
+                frogs[i].alive = False
+            calc_fitness_pop()
+    
+            create_frogs()
+            create_cars()
+            for i in range(99):
+                if frogs[i].alive is False:
+    
+                    del frogs[i]
+            count = 0
+
+
+import cProfile as profile
+profile.run('main()')
