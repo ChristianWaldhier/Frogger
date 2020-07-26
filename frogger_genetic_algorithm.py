@@ -1,6 +1,7 @@
 import random
 import pygame
 import sys
+import time
 pygame.font.init()
 
 SCREEN_WIDTH = 800
@@ -29,7 +30,7 @@ class Frog(object):
         self.x = x
         self.y = y
         self.rect = pygame.Rect(self.x, self.y, size, size)
-        self.color = pygame.Color("turquoise")
+        self.color = pygame.Color("Turquoise")
         self.vy = 0
         self.fitness = 0
         self.alive = True
@@ -56,13 +57,13 @@ class Frog(object):
 
         for car in cars:
             if self.rect.colliderect(car.rect):
-                self.color = pygame.Color("salmon")
+                self.color = pygame.Color("Salmon")
                 self.vy = 0
                 self.alive = False
                 
         for wall in walls:
             if self.rect.colliderect(wall.rect):
-                self.color = pygame.Color("salmon")
+                self.color = pygame.Color("Salmon")
                 self.vy = 0
                 self.alive = False
                 
@@ -86,23 +87,33 @@ class DNA():
             
 
 class Car():
-    def __init__(self, x, y, w, h):
+    def __init__(self, x, y, w, h, vx):
         cars.append(self)
         self.x = x
         self.y = y
         self.w = w
         self.h = h
         self.rect = pygame.Rect(x - w, y, w, h)
-        self.vx = 5
+        self.vx = vx
         self.color = pygame.Color("grey96")
         self.alive = True
                
     def move(self):
-        if self.x < SCREEN_WIDTH:
-            self.rect = pygame.Rect(self.x + self.vx, self.y, self.w, self.h)
-            self.x += self.vx
-        else:
-            self.x = -50
+        
+        if self.vx > 0:
+            if self.x < SCREEN_WIDTH:
+                self.rect = pygame.Rect(self.x + self.vx, self.y, self.w, self.h)
+                self.x += self.vx 
+            else:
+                self.x = -50
+                
+        if self.vx < 0:
+            if self.x > 0:
+                self.rect = pygame.Rect(self.x + self.vx, self.y, self.w, self.h)
+                self.x += self.vx
+            else:
+                self.x = SCREEN_WIDTH + 50
+        
      
     def draw(self):
         pygame.draw.rect(screen, self.color, self.rect)
@@ -166,19 +177,27 @@ def mutate(a):
 
 def create_frogs():
     for _ in range(population_count):
-        Frog(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100, 16)
+        Frog(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 25, 16)
 
 
 def create_cars():
     cars.clear()
-    Car(0, 100, 80, 50)
-    Car(-300, 200, 80, 50)
-    Car(-200, 300, 80, 50)
-    Car(0, 400, 80, 50)
-    Car(-100, 500, 80, 50)
+    Car(SCREEN_WIDTH, 80, 80, 50, -4)
+    Car(-500, 160, 80, 50, 7)
+    Car(SCREEN_WIDTH + 200, 240, 80, 50, -3)
+    Car(SCREEN_WIDTH + 500, 240, 80, 50, -3)
+    Car(0, 320, 80, 50, 4)
+    Car(SCREEN_WIDTH + 100, 400, 80, 50, -5)
+    Car(SCREEN_WIDTH + 500, 400, 80, 50, -5)
+    Car(-300, 480, 80, 50, 5)
 
 def draw_screen():
+
     screen.fill((51, 51, 51))
+    pygame.draw.rect(screen, pygame.Color("SteelBlue"), end_rect)
+    pygame.draw.rect(screen, pygame.Color("SteelBlue"), start_rect)
+    for wall in walls:
+        wall.draw()
     for frog in frogs:
         if frog.alive:
             frog.move()
@@ -186,15 +205,12 @@ def draw_screen():
     for car in cars:
         car.move()
         car.draw()
-    pygame.draw.rect(screen, pygame.Color("royalblue"), end_rect)
-    for wall in walls:
-        wall.draw()
-        
+
     draw_stats()
         
 def draw_stats():
     score_label = STAT_FONT.render("Generation: " + str(generation),1,(255,255,255))
-    screen.blit(score_label, (SCREEN_WIDTH - score_label.get_width() - 15, 10))
+    screen.blit(score_label, (SCREEN_WIDTH - score_label.get_width() - 15, 15))
 
 
 def calc_fitness_pop():
@@ -204,13 +220,16 @@ def calc_fitness_pop():
 
 
 pygame.init()
-pygame.display.set_caption("Get to the green square!")
+pygame.display.set_caption("Reach the other side!")
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 
+pygame.time.wait(15000)
+
 Wall(0, 0, SCREEN_WIDTH, 10)
-Wall(0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10)
-end_rect = pygame.Rect(0, 10, SCREEN_WIDTH, 32)
+Wall(0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 20)
+end_rect = pygame.Rect(0, 10, SCREEN_WIDTH, 40)
+start_rect = pygame.Rect(0, SCREEN_HEIGHT-50, SCREEN_WIDTH, 40)
 create_frogs()
 create_cars()
 
