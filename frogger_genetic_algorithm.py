@@ -3,6 +3,9 @@ import pygame
 import sys
 
 pygame.font.init()
+pygame.init()
+pygame.display.set_caption("Reach the other side!")
+
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -17,6 +20,9 @@ fitness_pop = 0
 
 START_SPEED = 30
 speed = START_SPEED
+
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+clock = pygame.time.Clock()
 
 cars = []
 walls = []
@@ -193,6 +199,7 @@ def create_cars():
 
 def draw_screen():
     screen.fill((51, 51, 51))
+
     pygame.draw.rect(screen, pygame.Color("SteelBlue"), end_rect)
     pygame.draw.rect(screen, pygame.Color("SteelBlue"), start_rect)
     for wall in walls:
@@ -218,22 +225,15 @@ def calc_fitness_pop():
     for frog in frogs:
         fitness_pop += frog.fitness
 
-
-pygame.init()
-pygame.display.set_caption("Reach the other side!")
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-clock = pygame.time.Clock()
-
-
-Wall(0, 0, SCREEN_WIDTH, 10)
-Wall(0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 20)
-end_rect = pygame.Rect(0, 10, SCREEN_WIDTH, 40)
-start_rect = pygame.Rect(0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, 40)
-create_frogs()
-create_cars()
-
 def main():
-    global speed, count, generation, frogs
+    global speed, count, generation, frogs, end_rect, start_rect
+    Wall(0, 0, SCREEN_WIDTH, 10)
+    Wall(0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 20)
+    end_rect = pygame.Rect(0, 10, SCREEN_WIDTH, 40)
+    start_rect = pygame.Rect(0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, 40)
+
+    create_frogs()
+    create_cars()
     
     while True:
         
