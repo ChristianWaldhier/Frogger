@@ -27,29 +27,22 @@ class Nnet:
 
     def __init__(self, num_input, num_hidden, num_output):
         self.num_input = num_input
+        self.inputs = [0] * num_input
         self.num_hidden = num_hidden
+        self.hidden_inputs = [0] * num_hidden
         self.num_output = num_output
+        self.final_outputs = [0] * num_output
         self.weight_input_hidden = np.random.uniform(-0.5, 0.5, size=(self.num_hidden, self.num_input))
         self.weight_hidden_output = np.random.uniform(-0.5, 0.5, size=(self.num_output, self.num_hidden))
         self.activation_function = lambda x: scipy.special.expit(x)
 
     def get_outputs(self, inputs_list):
-        inputs = np.array(inputs_list, ndmin=2).T
-        hidden_inputs = np.dot(self.weight_input_hidden, inputs)
-        hidden_outputs = self.activation_function(hidden_inputs)
+        self.inputs = np.array(inputs_list, ndmin=2).T
+        self.hidden_inputs = np.dot(self.weight_input_hidden, self.inputs)
+        hidden_outputs = self.activation_function(self.hidden_inputs)
         final_inputs = np.dot(self.weight_hidden_output, hidden_outputs)
-        final_outputs = self.activation_function(final_inputs)
-        return final_outputs
-    
-    def get_hidden_layer(self, inputs_list):
-        inputs = np.array(inputs_list, ndmin=2).T
-        hidden_inputs = np.dot(self.weight_input_hidden, inputs)
-        hidden_outputs = self.activation_function(hidden_inputs)
-        final_inputs = np.dot(self.weight_hidden_output, hidden_outputs)
-        final_outputs = self.activation_function(final_inputs)
-        return hidden_inputs
-    
-
+        self.final_outputs = self.activation_function(final_inputs)
+        return self.final_outputs 
 
     def get_max_value(self, inputs_list):
         outputs = self.get_outputs(inputs_list)
@@ -90,11 +83,11 @@ class Nnet:
         return res
 
     def draw(self):
-        inputs = np.random.uniform(0, 1, size=(self.num_input))
+        
                 
-        input_layer = Layer(inputs, 1)
-        hidden_layer = Layer(self.get_hidden_layer(inputs), 2)
-        output_layer = Layer(self.get_outputs(inputs), 3)
+        input_layer = Layer(self.inputs, 1)
+        hidden_layer = Layer(self.hidden_inputs, 2)
+        output_layer = Layer(self.final_outputs, 3)
         
         for input_neuron in input_layer.neurons:
             for hidden_neuron in hidden_layer.neurons:
@@ -112,11 +105,14 @@ class Nnet:
         for hidden_neuron in hidden_layer.neurons:
             hidden_neuron.draw()
         for output_neuron in output_layer.neurons:
-            print(output_neuron.color_test)
+            # print(output_neuron.color_test)
             output_neuron.draw()
 
 
 def tests():
+    
+    nnet = Nnet(2, 5, 1)
+    
     ar1 = np.random.uniform(-0.5, 0.5, size=(3, 4))
     ar2 = np.random.uniform(-0.5, 0.5, size=(3, 4))
     print('ar1.size', ar1.size, sep='\n')
@@ -198,11 +194,12 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-         
+        test_net.get_outputs(np.random.uniform(0, 1, size=(test_net.num_input)))
+
         test_net.draw()
         pygame.display.flip()
 
 
 if __name__ == "__main__":
-    # tests()
+    tests()
     main()
