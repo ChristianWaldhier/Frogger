@@ -83,19 +83,20 @@ class Nnet:
         return res
 
     def draw(self):
+        screen.fill((51, 51, 51))
         
                 
         input_layer = Layer(self.inputs, 1)
         hidden_layer = Layer(self.hidden_inputs, 2)
         output_layer = Layer(self.final_outputs, 3)
         
-        for input_neuron in input_layer.neurons:
-            for hidden_neuron in hidden_layer.neurons:
-                Weight(input_neuron, hidden_neuron)
+        for i_input, input_neuron in enumerate(input_layer.neurons):
+            for i_hidden, hidden_neuron in enumerate(hidden_layer.neurons):
+                Weight(input_neuron, hidden_neuron, (self.weight_input_hidden[i_hidden, i_input]))
                 
-        for hidden_neuron in hidden_layer.neurons:
-            for output_neuron in output_layer.neurons:
-                Weight(hidden_neuron, output_neuron)
+        for i_hidden, hidden_neuron in enumerate(hidden_layer.neurons):
+            for i_output, output_neuron in enumerate(output_layer.neurons):
+                Weight(hidden_neuron, output_neuron, (self.weight_hidden_output[i_output, i_hidden]))
     
         for weight in weights:
             weight.draw()
@@ -169,11 +170,12 @@ class Layer():
         
         
 class Weight():
-    def __init__(self, from_neuron, to_neuron):
+    def __init__(self, from_neuron, to_neuron, value):
         weights.append(self)
         self.from_point = from_neuron.x, from_neuron.y
         self.to_point = to_neuron.x, to_neuron.y
-        self.width = 3
+        self.value = value
+        self.width = abs(int(self.value * 30))
         self.color = pygame.Color("Turquoise")
         
     def draw(self):
